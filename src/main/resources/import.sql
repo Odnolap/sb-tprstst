@@ -1,0 +1,4 @@
+INSERT INTO payment (id, product_article, contragent_id, contragent_time, summ, registration_time, status) VALUES (1, '100-8', 4, TIMESTAMP '2016-07-30 22:31:46', 584.12, TIMESTAMP '2016-07-30 22:34:01', 0);
+INSERT INTO payment (id, product_article, contragent_id, contragent_time, summ, registration_time, status) VALUES (2, '100-1', 2, TIMESTAMP '2016-07-30 21:08:15', 322.48, TIMESTAMP '2016-07-30 21:10:33', 0);
+INSERT INTO payment (id, product_article, contragent_id, contragent_time, summ, registration_time, status) VALUES (3, '100-3', 2, TIMESTAMP '2016-07-30 23:11:52', 122.03, TIMESTAMP '2016-07-30 23:14:29', 0);
+INSERT INTO payment (id, product_article, contragent_id, contragent_time, summ, registration_time, status, authorization_time) VALUES (4, '100-5', 6, TIMESTAMP '2016-07-31 22:15:11', 584.61, TIMESTAMP '2016-07-31 22:16:10', 1, TIMESTAMP '2016-07-31 22:16:42');

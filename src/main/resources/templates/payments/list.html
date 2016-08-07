@@ -1,0 +1,85 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>sb-tprstst</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+<section>
+    <h2>Payments</h2>
+    <form method="post" action="payments">
+        <dl>
+            <dt>Артикул товара:</dt>
+            <dd><input type="text" name="productArticle" id="productArticle" th:value="${productArticle}"/></dd>
+        </dl>
+        <dl>
+            <dt>id Контрагента:</dt>
+            <dd><input type="number" name="contragentId" id="contragentId" th:attr="value=${contragentId}"/></dd>
+        </dl>
+        <dl>
+            <dt>Сумма от:</dt>
+            <dd><input type="number" step="0.01" name="sumFrom" id="sumFrom" th:value="${sumFrom}"/></dd>
+        </dl>
+        <dl>
+            <dt>Сумма до:</dt>
+            <dd><input type="number" step="0.01" name="sumTo" id="sumTo" th:value="${sumTo}"/></dd>
+        </dl>
+        <dl>
+            <dt>Статус (0 или 1):</dt>
+            <dd><input type="number" step="1" min="0" max="1" name="status" id="status" th:value="${status}"/></dd>
+        </dl>
+        <dl>
+            <dt>Дата контрагента от:</dt>
+            <dd><input type="datetime-local" name="contragentTimeFrom" id="contragentTimeFrom" th:value="${contragentTimeFrom}"/></dd>
+        </dl>
+        <dl>
+            <dt>Дата контрагента до:</dt>
+            <dd><input type="datetime-local" name="contragentTimeTo" id="contragentTimeTo" th:value="${contragentTimeTo}"/></dd>
+        </dl>
+        <dl>
+            <dt>Дата регистрации от:</dt>
+            <dd><input type="datetime-local" name="registrationTimeFrom" id="registrationTimeFrom" th:value="${registrationTimeFrom}"/></dd>
+        </dl>
+        <dl>
+            <dt>Дата регистрации до:</dt>
+            <dd><input type="datetime-local" name="registrationTimeTo" id="registrationTimeTo" th:value="${registrationTimeTo}"/></dd>
+        </dl>
+        <dl>
+            <dt>Дата подтверждения от:</dt>
+            <dd><input type="datetime-local" name="authorizationTimeFrom" id="authorizationTimeFrom" th:value="${authorizationTimeFrom}"/></dd>
+        </dl>
+        <dl>
+            <dt>Дата подтверждения до:</dt>
+            <dd><input type="datetime-local" name="authorizationTimeTo" id="authorizationTimeTo" th:value="${authorizationTimeTo}"/></dd>
+        </dl>
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+    <hr/>
+    <table border="1" cellpadding="8" cellspacing="0" >
+        <thead>
+        <tr>
+            <th>Товар</th>
+            <th>Контрагент</th>
+            <th>Сумма</th>
+            <th>Статус</th>
+            <th>Дата контрагента</th>
+            <th>Дата регистрации в системе</th>
+            <th>Дата подтверждения в системе</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-th-each="payment : ${paymentList}">
+            <td data-th-text="${payment.productArticle}"></td>
+            <td data-th-text="${payment.contragentId}"></td>
+            <td data-th-text="${payment.sum}"></td>
+            <td data-th-text="${payment.status}"></td>
+            <td data-th-text="${payment.contragentTime}"></td>
+            <td data-th-text="${payment.registrationTime}"></td>
+            <td data-th-text="${payment.authorizationTime}"></td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>
