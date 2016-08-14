@@ -1,22 +1,31 @@
 package ru.odnolap.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Repository
 public class PaymentRepository  {
+    private final static Sort SORT_REGISTRATION_TIME_DESC = new Sort(Sort.Direction.DESC, "registrationTime");
+    private static final Date MIN_DATE_TIME;
+    private static final Date MAX_DATE_TIME;
+    static {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(1900, Calendar.JANUARY, 1, 0, 0);
+        MIN_DATE_TIME = calendar.getTime();
+        calendar.set(2900, Calendar.JANUARY, 1, 0, 0);
+        MAX_DATE_TIME = calendar.getTime();
+    }
 
     @Autowired
     PaymentRepositoryProxy proxy;
 
-    public List<Payment> findAll(){
-        return proxy.findAll();
+    public List<Payment> getAll(){
+        return proxy.findAll(SORT_REGISTRATION_TIME_DESC);
     }
 
     public Payment get(Integer id) {
@@ -24,33 +33,58 @@ public class PaymentRepository  {
     }
 
     public Payment save(Payment payment) {
-        if (payment.getSum() == null) {
-            BigDecimal bd = new BigDecimal(ThreadLocalRandom.current().nextDouble(100d, 100000d));
-            payment.setSum(bd.setScale(2, RoundingMode.HALF_UP).doubleValue());
-        }
         return proxy.save(payment);
     }
 
-    public List<Payment> filter
-            (String productArticle, Integer contragentIdFrom, Integer contragentIdTo,
-             Double sumFrom, Double sumTo, Integer statusFrom, Integer statusTo,
-             Date contragentTimeFrom, Date contragentTimeTo,
-             Date registratioinDateFrom, Date RegistrationDateTo,
+    public List<Payment> getFiltered
+            (String productArticle, Integer contragentId,
+             Double sumFrom, Double sumTo, Integer status,
+             Date contragentDateFrom, Date contragentDateTo,
+             Date registratioinDateFrom, Date registrationDateTo,
              Date authorizationDateFrom, Date authorizationDateTo){
-        return proxy.findByProductArticleLikeAndContragentIdBetweenAndSumBetweenAndStatusBetweenAndContragentTimeBetweenAndRegistrationTimeBetweenAndAuthorizationTimeBetweenOrderByRegistrationTimeDesc(
-                productArticle, contragentIdFrom, contragentIdTo, sumFrom, sumTo, statusFrom, statusTo, contragentTimeFrom, contragentTimeTo,
-                registratioinDateFrom, RegistrationDateTo, authorizationDateFrom, authorizationDateTo
-        );
-    }
+        String productArticlePattern = productArticle == null ? "%" : productArticle.isEmpty() ? "%" : productArticle;
+        Integer contragentIdFrom = contragentId == null ? -2000000000 : contragentId;
+        Integer contragentIdTo = contragentId == null ? 2000000000 : contragentId;
+        Integer statusFrom = status == null ? 0 : status;
+        Integer statusTo = status == null ? 1 : status;
+        if (sumFrom == null) {
+            sumFrom = 1d;
+        }
+        if (sumTo == null) {
+            sumTo = 9999999999d;
+        }
+        if (contragentDateFrom == null) {
+            contragentDateFrom = MIN_DATE_TIME;
+        }
+        if (contragentDateTo == null) {
+            contragentDateTo = MAX_DATE_TIME;
+        }
+        if (registratioinDateFrom == null) {
+            registratioinDateFrom = MIN_DATE_TIME;
+        }
+        if (registrationDateTo == null) {
+            registrationDateTo = MAX_DATE_TIME;
+        }
 
-    public List<Payment> filterWithoutRegistrationTime
-            (String productArticle, Integer contragentIdFrom, Integer contragentIdTo,
-             Double sumFrom, Double sumTo, Integer statusFrom, Integer statusTo,
-             Date contragentTimeFrom, Date contragentTimeTo,
-             Date registratioinDateFrom, Date RegistrationDateTo){
-        return proxy.findByProductArticleLikeAndContragentIdBetweenAndSumBetweenAndStatusBetweenAndContragentTimeBetweenAndRegistrationTimeBetweenOrderByRegistrationTimeDesc(
-                productArticle, contragentIdFrom, contragentIdTo, sumFrom, sumTo, statusFrom, statusTo, contragentTimeFrom, contragentTimeTo,
-                registratioinDateFrom, RegistrationDateTo
-        );
+        if (authorizationDateFrom == null && authorizationDateTo == null) { // Возвращаем платежи с любой датой подтверждения, в т.ч. с пустой
+            return proxy.findByProductArticleLikeAndContragentIdBetweenAndSumBetweenAndStatusBetweenAndContragentTimeBetweenAndRegistrationTimeBetweenOrderByRegistrationTimeDesc
+                    (productArticlePattern, contragentIdFrom, contragentIdTo, sumFrom, sumTo,
+                            statusFrom, statusTo,
+                            contragentDateFrom, contragentDateTo,
+                            registratioinDateFrom, registrationDateTo);
+        } else {
+            if (authorizationDateFrom == null) {
+                authorizationDateFrom = MIN_DATE_TIME;
+            }
+            if (authorizationDateTo == null) {
+                authorizationDateTo = MAX_DATE_TIME;
+            }
+            return proxy.findByProductArticleLikeAndContragentIdBetweenAndSumBetweenAndStatusBetweenAndContragentTimeBetweenAndRegistrationTimeBetweenAndAuthorizationTimeBetweenOrderByRegistrationTimeDesc
+                    (productArticlePattern, contragentIdFrom, contragentIdTo, sumFrom, sumTo,
+                            statusFrom, statusTo,
+                            contragentDateFrom, contragentDateTo,
+                            registratioinDateFrom, registrationDateTo,
+                            authorizationDateFrom, authorizationDateTo);
+        }
     }
 }

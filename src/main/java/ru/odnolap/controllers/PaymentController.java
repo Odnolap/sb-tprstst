@@ -7,32 +7,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.odnolap.domain.PaymentRepository;
+import ru.odnolap.service.PaymentService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 @Controller
 public class PaymentController {
-    private static final Date MIN_DATE_TIME;
-    private static final Date MAX_DATE_TIME;
-    static {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(1900, Calendar.JANUARY, 1, 0, 0);
-        MIN_DATE_TIME = calendar.getTime();
-        calendar.set(2900, Calendar.JANUARY, 1, 0, 0);
-        MAX_DATE_TIME = calendar.getTime();
-    }
-
 
     @Autowired
-    private PaymentRepository repository;
+    private PaymentService service;
 
     @RequestMapping(value = "/payments", method = RequestMethod.GET)
     public String paymentList(Model model) {
-        model.addAttribute("paymentList", repository.findAll());
+        model.addAttribute("paymentList", service.getAll());
         return "payments/list";
     }
 
@@ -49,82 +38,43 @@ public class PaymentController {
                            @RequestParam("authorizationTimeFrom") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm") Date authorizationTimeFrom,
                            @RequestParam("authorizationTimeTo") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm") Date authorizationTimeTo,
                            HttpServletRequest request, Model model) {
-        Integer contragentIdFrom;
-        Integer contragentIdTo;
-        Integer statusFrom;
-        Integer statusTo;
-
-        if (productArticle == null || productArticle.isEmpty()) {
-            productArticle = "%";
-        } else {
+        if (productArticle != null ) {
             request.setAttribute("productArticle", productArticle);
         }
-        if (contragentId == null) {
-            contragentIdFrom = -2000000000;
-            contragentIdTo = 2000000000;
-        } else {
-            contragentIdFrom = contragentId;
-            contragentIdTo = contragentId;
-            request.setAttribute("contragentId", contragentId.toString());
+        if (contragentId != null) {
+            request.setAttribute("contragentId", contragentId);
         }
-        if (sumFrom == null) {
-            sumFrom = 1d;
-        } else {
+        if (sumFrom != null) {
             request.setAttribute("sumFrom", sumFrom/*.toString()*/);
         }
-        if (sumTo == null) {
-            sumTo = 9999999999d;
-        } else {
+        if (sumTo != null) {
             request.setAttribute("sumTo", sumTo/*.toString()*/);
         }
-        if (status == null) {
-            statusFrom = 0;
-            statusTo = 1;
-        } else {
-            statusFrom = status;
-            statusTo = status;
+        if (status != null) {
             request.setAttribute("status", status/*.toString()*/);
         }
-        if (contragentTimeFrom == null) {
-            contragentTimeFrom = MIN_DATE_TIME;
-        } else {
+        if (contragentTimeFrom != null) {
             request.setAttribute("contragentTimeFrom", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(contragentTimeFrom));
         }
-        if (contragentTimeTo == null) {
-            contragentTimeTo = MAX_DATE_TIME;
-        } else {
+        if (contragentTimeTo != null) {
             request.setAttribute("contragentTimeTo", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(contragentTimeTo));
         }
-        if (registrationTimeFrom == null) {
-            registrationTimeFrom = MIN_DATE_TIME;
-        } else {
+        if (registrationTimeFrom != null) {
             request.setAttribute("registrationTimeFrom", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(registrationTimeFrom));
         }
-        if (registrationTimeTo == null) {
-            registrationTimeTo = MAX_DATE_TIME;
-        } else {
+        if (registrationTimeTo != null) {
             request.setAttribute("registrationTimeTo", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(registrationTimeTo));
         }
-
-        if (authorizationTimeFrom == null && authorizationTimeTo == null) {
-            model.addAttribute("paymentList",
-                    repository.filterWithoutRegistrationTime(productArticle, contragentIdFrom, contragentIdTo, sumFrom, sumTo, statusFrom, statusTo, contragentTimeFrom, contragentTimeTo,
-                            registrationTimeFrom, registrationTimeTo));
-        } else {
-            if (authorizationTimeFrom == null) {
-                authorizationTimeFrom = MIN_DATE_TIME;
-            } else {
-                request.setAttribute("authorizationTimeFrom", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(authorizationTimeFrom));
-            }
-            if (authorizationTimeTo == null) {
-                authorizationTimeTo = MAX_DATE_TIME;
-            } else {
-                request.setAttribute("authorizationTimeTo", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(authorizationTimeTo));
-            }
-            model.addAttribute("paymentList",
-                    repository.filter(productArticle, contragentIdFrom, contragentIdTo, sumFrom, sumTo, statusFrom, statusTo, contragentTimeFrom, contragentTimeTo,
-                            registrationTimeFrom, registrationTimeTo, authorizationTimeFrom, authorizationTimeTo));
+        if (authorizationTimeFrom != null) {
+            request.setAttribute("authorizationTimeFrom", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(authorizationTimeFrom));
         }
+        if (authorizationTimeTo != null) {
+            request.setAttribute("authorizationTimeTo", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(authorizationTimeTo));
+        }
+
+        model.addAttribute("paymentList",
+                service.getFiltered(productArticle, contragentId, sumFrom, sumTo, status, contragentTimeFrom, contragentTimeTo,
+                        registrationTimeFrom, registrationTimeTo, authorizationTimeFrom, authorizationTimeTo));
         return "payments/list";
     }
 

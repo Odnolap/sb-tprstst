@@ -1,8 +1,5 @@
 package ru.odnolap.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
@@ -16,42 +13,30 @@ public class Payment {
 
     @Id
     @GeneratedValue
-    @JsonProperty("payment_id")
-    @JsonView(View.PREPARE.class)
     private Integer id; // id платежа
 
     @NotEmpty
     @Column(name = "product_article")
-    @JsonIgnore
     private String productArticle; // артикул товара
 
     @NotNull
     @Column(name = "contragent_id")
-    @JsonIgnore
     private Integer contragentId; // id контрагента
 
     @NotNull
     @Column(name = "contragent_time")
-    @JsonIgnore
     private Date contragentTime; // дата платежа контрагента
 
     @Column(name = "summ")
     @Digits(fraction = 2, integer = 10)
-    @JsonProperty("sum")
-    @JsonView(View.PREPARE.class)
     private Double sum; // сумма платежа
 
     @Column(name = "registration_time")
-    @JsonProperty("time")
-    @JsonView(View.PREPARE.class)
     private Date registrationTime; // дата регистрация платежа в системе
 
     @Column(name = "authorization_time")
-    @JsonProperty("authorization_time")
-    @JsonView(View.PAY.class)
     private Date authorizationTime; // дата подтверждения платежа в системе
 
-    @JsonIgnore
     private Integer status = 0; // статус платежа: 0 - зарегистрирован, 1 - подтвержден
 
     public Payment() {}

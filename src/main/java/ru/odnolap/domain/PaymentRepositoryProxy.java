@@ -11,13 +11,13 @@ public interface PaymentRepositoryProxy extends JpaRepository<Payment, Integer> 
             (String productArticle, Integer contragentIdFrom, Integer contragentIdTo,
              Double sumFrom, Double sumTo, Integer statusFrom, Integer statusTo,
              Date contragentDateFrom, Date contragentDateTo,
-             Date registratioinDateFrom, Date RegistrationDateTo,
+             Date registratioinDateFrom, Date registrationDateTo,
              Date authorizationDateFrom, Date authorizationDateTo);
 
     List<Payment> findByProductArticleLikeAndContragentIdBetweenAndSumBetweenAndStatusBetweenAndContragentTimeBetweenAndRegistrationTimeBetweenOrderByRegistrationTimeDesc
             (String productArticle, Integer contragentIdFrom, Integer contragentIdTo,
              Double sumFrom, Double sumTo, Integer statusFrom, Integer statusTo,
              Date contragentDateFrom, Date contragentDateTo,
-             Date registratioinDateFrom, Date RegistrationDateTo);
+             Date registratioinDateFrom, Date registrationDateTo);
 
 }
