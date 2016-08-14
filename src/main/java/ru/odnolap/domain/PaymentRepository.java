@@ -22,7 +22,7 @@ public class PaymentRepository  {
     }
 
     @Autowired
-    PaymentRepositoryProxy proxy;
+    private PaymentRepositoryProxy proxy;
 
     public List<Payment> getAll(){
         return proxy.findAll(SORT_REGISTRATION_TIME_DESC);
